@@ -1,36 +1,195 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TukTukIndia - Vehicle Rental & Local Experiences Marketplace
+
+A production-ready web application inspired by TukTukRental.com, combining vehicle rental (tuk-tuks, scooters, bikes) with local experiences marketplace and gamified driver tournaments.
+
+## Features
+
+### Core Features
+- **Vehicle Rental System**: Browse, search, and book tuk-tuks, scooters, and bikes
+- **Local Experiences**: Book tours and experiences with local guides
+- **Booking Engine**: Complete booking flow with date selection, pricing, and payment
+- **Tournament System**: Weekly driver competitions with leaderboards and rewards
+- **Chat System**: Real-time messaging between users and hosts/guides
+- **Rating & Reviews**: Comprehensive review system with photos
+- **Admin Dashboard**: Manage listings, users, and platform analytics
+
+### Technical Stack
+- **Frontend**: Next.js 14+ (App Router), TypeScript, Tailwind CSS
+- **Backend**: Firebase (Auth, Firestore, Storage)
+- **Payments**: Razorpay integration
+- **Deployment**: Vercel
+
+## Project Structure
+
+```
+tuktukindia/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── (auth)/            # Authentication pages
+│   │   ├── (main)/            # Public pages
+│   │   ├── dashboard/         # User/Host/Admin dashboards
+│   │   ├── host/              # Host onboarding
+│   │   ├── guide/             # Guide onboarding
+│   │   ├── api/               # API routes
+│   │   └── page.tsx           # Landing page
+│   ├── components/            # React components
+│   │   ├── ui/               # Base UI components
+│   │   ├── vehicles/          # Vehicle-specific components
+│   │   ├── experiences/        # Experience components
+│   │   ├── booking/           # Booking components
+│   │   ├── tournament/         # Tournament components
+│   │   ├── chat/              # Chat components
+│   │   ├── admin/             # Admin components
+│   │   └── layout/            # Header, Footer, etc.
+│   ├── contexts/              # React contexts (Auth, etc.)
+│   ├── hooks/                 # Custom hooks
+│   ├── lib/                   # Utilities, Firebase config
+│   ├── services/              # Business logic services
+│   ├── types/                 # TypeScript interfaces
+│   └── constants/             # App constants
+├── public/                    # Static assets
+├── firestore.rules           # Firestore security rules
+├── storage.rules              # Storage security rules
+└── .env.example              # Environment variables template
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Firebase project
+- Razorpay account
 
+### Installation
+
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd tuktukindia
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Set up environment variables**
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env.local` with your credentials:
 
-## Learn More
+```env
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-To learn more about Next.js, take a look at the following resources:
+# Razorpay
+NEXT_PUBLIC_RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# App URLs
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Set up Firebase**
+   - Create a Firebase project at https://console.firebase.google.com
+   - Enable Authentication (Email/Password)
+   - Create Firestore database
+   - Create Storage bucket
+   - Deploy Firestore rules from `firestore.rules`
+   - Deploy Storage rules from `storage.rules`
 
-## Deploy on Vercel
+5. **Set up Razorpay**
+   - Create a Razorpay account at https://razorpay.com
+   - Get your API keys from Dashboard > Settings > API Keys
+   - Configure webhook URL for production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. **Run the development server**
+```bash
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## Deployment
+
+### Deploy to Vercel
+
+1. **Push to GitHub**
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin <your-github-repo>
+git push -u origin main
+```
+
+2. **Connect to Vercel**
+   - Go to https://vercel.com
+   - Import your GitHub repository
+   - Add environment variables in Vercel dashboard
+   - Deploy
+
+3. **Configure Firebase**
+   - Update authorized domains in Firebase Console
+   - Add Vercel domain to authorized domains
+
+### Firestore Setup for Production
+
+1. Deploy rules:
+```bash
+firebase deploy --only firestore:rules
+```
+
+2. Create indexes (in Firebase Console or via CLI):
+```bash
+firebase firestore:indexes
+```
+
+## Database Schema
+
+### Collections
+
+- **users**: User profiles with role-based access
+- **vehicles**: Vehicle listings
+- **experiences**: Experience/tour listings
+- **bookings**: All bookings (vehicles & experiences)
+- **reviews**: Reviews for vehicles and experiences
+- **tournaments**: Tournament configurations
+- **chats**: Chat conversations
+- **notifications**: User notifications
+
+See `SPEC.md` for detailed schema documentation.
+
+## API Routes
+
+| Endpoint | Method | Purpose |
+|---------|--------|---------|
+| `/api/payments/create-order` | POST | Create Razorpay order |
+| `/api/payments/verify` | POST | Verify payment signature |
+| `/api/payments/webhook` | POST | Handle Razorpay webhooks |
+
+## Security
+
+- Firebase Authentication required for all authenticated actions
+- Firestore security rules enforce access control
+- Input validation using Zod schemas
+- Server-side payment verification
+- XSS protection via React's built-in escaping
+
+## License
+
+MIT License - feel free to use for your own projects.
+
+## Contributing
+
+Contributions are welcome! Please read the contribution guidelines before submitting PRs.
