@@ -1,7 +1,8 @@
 {
-  "name": "tuktukindia",
-  "version": "0.1.0",
+  "name": "helphive",
+  "version": "1.0.0",
   "private": true,
+  "description": "Community Help & Services Platform",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

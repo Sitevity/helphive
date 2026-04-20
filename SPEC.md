@@ -1,8 +1,8 @@
-# TukTukIndia - Vehicle Rental & Experience Marketplace
+# Helphive - Community Help & Services Platform
 
 ## 1. Concept & Vision
 
-TukTukIndia is a vibrant, community-driven marketplace connecting travelers with local vehicle owners (tuk-tuks, scooters, bikes) and experiential guides. The platform celebrates the chaotic charm of Indian streets while providing a safe, modern booking experience. Think Airbnb meets Uber for India's iconic three-wheelers, with a gamified twist through driver tournaments.
+Helphive is a vibrant, community-driven platform connecting people who need help with local service providers, community helpers, and professional service providers. The platform celebrates the spirit of community cooperation while providing a safe, modern experience for finding and providing help.
 
 **Personality**: Warm, energetic, trustworthy — like a helpful local friend who speaks both the tourist language and the street lingo.
 
@@ -11,7 +11,7 @@ TukTukIndia is a vibrant, community-driven marketplace connecting travelers with
 ## 2. Design Language
 
 ### Aesthetic Direction
-**"Modern India"** — Clean interfaces with pops of Indian color. Inspired by Airbnb's usability with OTP Buses' vibrant energy. Warm terracottas, saffron accents, and teal highlights against clean whites and soft grays.
+**"Community Warmth"** — Clean interfaces with pops of vibrant community colors. Inspired by Airbnb's usability with a warm, helping-hands feel. Warm oranges, teal accents, and purple highlights against clean whites and soft grays.
 
 ### Color Palette
 ```css
