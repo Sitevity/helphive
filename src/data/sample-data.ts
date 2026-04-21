@@ -1,46 +1,46 @@
 import { Vehicle, VehicleType } from '@/types';
 
-// Reliable placeholder images
-const PLACEHOLDER_VEHICLE = 'https://picsum.photos/seed/vehicle/800/600';
-const PLACEHOLDER_CITY = 'https://picsum.photos/seed/city/1200/800';
-const PLACEHOLDER_EXPERIENCE = 'https://picsum.photos/seed/experience/800/600';
+// Simple reliable image URLs using picsum.photos
+const PLACEHOLDER_VEHICLE = 'https://picsum.photos/800/600';
+const PLACEHOLDER_CITY = 'https://picsum.photos/1200/800';
+const PLACEHOLDER_EXPERIENCE = 'https://picsum.photos/800/600';
 
-// Vehicle images (using Unsplash with verified working IDs)
+// Vehicle images - using picsum with unique IDs
 const VEHICLE_IMAGES = {
-  auto1: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-  auto2: 'https://images.unsplash.com/photo-1570126023343-4501db2b79d7?w=800&q=80',
-  auto3: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&q=80',
-  scooter1: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80',
-  bike1: 'https://images.unsplash.com/photo-1550972851-13d7d53a4f38?w=800&q=80',
-  electric1: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80',
+  auto1: 'https://picsum.photos/id/237/800/600',
+  auto2: 'https://picsum.photos/id/238/800/600',
+  auto3: 'https://picsum.photos/id/239/800/600',
+  scooter1: 'https://picsum.photos/id/240/800/600',
+  bike1: 'https://picsum.photos/id/241/800/600',
+  electric1: 'https://picsum.photos/id/242/800/600',
 };
 
 // City images
 const CITY_IMAGES = {
-  goa: 'https://picsum.photos/seed/goacity/1200/800',
-  jaipur: 'https://picsum.photos/seed/jaipurcity/1200/800',
-  delhi: 'https://picsum.photos/seed/delhicity/1200/800',
-  bangalore: 'https://picsum.photos/seed/bangalorecity/1200/800',
-  mumbai: 'https://picsum.photos/seed/mumbaicity/1200/800',
-  udaipur: 'https://picsum.photos/seed/udaipurcity/1200/800',
-  chennai: 'https://picsum.photos/seed/chennaicity/1200/800',
-  kolkata: 'https://picsum.photos/seed/kolkatacity/1200/800',
-  pune: 'https://picsum.photos/seed/punecity/1200/800',
+  goa: 'https://picsum.photos/id/1018/1200/800',
+  jaipur: 'https://picsum.photos/id/1019/1200/800',
+  delhi: 'https://picsum.photos/id/1020/1200/800',
+  bangalore: 'https://picsum.photos/id/1021/1200/800',
+  mumbai: 'https://picsum.photos/id/1022/1200/800',
+  udaipur: 'https://picsum.photos/id/1023/1200/800',
+  chennai: 'https://picsum.photos/id/1024/1200/800',
+  kolkata: 'https://picsum.photos/id/1025/1200/800',
+  pune: 'https://picsum.photos/id/1026/1200/800',
 };
 
 // Experience images
 const EXPERIENCE_IMAGES = {
-  sunset: 'https://picsum.photos/seed/sunset/800/600',
-  spice: 'https://picsum.photos/seed/spice/800/600',
-  heritage: 'https://picsum.photos/seed/heritage/800/600',
-  fort: 'https://picsum.photos/seed/fort/800/600',
-  food: 'https://picsum.photos/seed/food/800/600',
-  yoga: 'https://picsum.photos/seed/yoga/800/600',
-  bollywood: 'https://picsum.photos/seed/bollywood/800/600',
-  slum: 'https://picsum.photos/seed/slum/800/600',
-  beer: 'https://picsum.photos/seed/beer/800/600',
-  trek: 'https://picsum.photos/seed/trek/800/600',
-  lake: 'https://picsum.photos/seed/lake/800/600',
+  sunset: 'https://picsum.photos/id/1011/800/600',
+  spice: 'https://picsum.photos/id/1012/800/600',
+  heritage: 'https://picsum.photos/id/1013/800/600',
+  fort: 'https://picsum.photos/id/1014/800/600',
+  food: 'https://picsum.photos/id/1015/800/600',
+  yoga: 'https://picsum.photos/id/1016/800/600',
+  bollywood: 'https://picsum.photos/id/1017/800/600',
+  slum: 'https://picsum.photos/id/1000/800/600',
+  beer: 'https://picsum.photos/id/1001/800/600',
+  trek: 'https://picsum.photos/id/1002/800/600',
+  lake: 'https://picsum.photos/id/1003/800/600',
 };
 
 export interface VehicleData {
