@@ -1,535 +1,304 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Search, SlidersHorizontal, MapPin, Calendar, Users, ChevronDown, X, ArrowRight } from 'lucide-react';
-import { CITIES } from '@/constants';
+import { Button } from '@/components/ui';
+import { Badge } from '@/components/ui';
+import { Search, MapPin, Calendar, Users, ArrowRight, Star, Zap, Shield, Trophy, TrendingUp, ChevronRight } from 'lucide-react';
+import { sampleVehicles, sampleExperiences, CITIES_DATA } from '@/data/sample-data';
+import { formatCurrency } from '@/lib/utils';
 
-// City data with images and counts
-const CITIES_DATA = [
-  { name: 'Mumbai', image: 'https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=400&h=300&fit=crop', count: 156, description: 'The City of Dreams' },
-  { name: 'Delhi', image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=300&fit=crop', count: 203, description: 'Historic Capital' },
-  { name: 'Bangalore', image: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=400&h=300&fit=crop', count: 178, description: 'Garden City' },
-  { name: 'Chennai', image: 'https://images.unsplash.com/photo-1587370560942-ad2a04eabb6d?w=400&h=300&fit=crop', count: 132, description: 'Detroit of India' },
-  { name: 'Hyderabad', image: 'https://images.unsplash.com/photo-1573352868081-b33749d05ffd?w=400&h=300&fit=crop', count: 156, description: 'City of Pearls' },
-  { name: 'Kolkata', image: 'https://images.unsplash.com/photo-1550960282-c1a5c23b8e21?w=400&h=300&fit=crop', count: 98, description: 'City of Joy' },
-  { name: 'Pune', image: 'https://images.unsplash.com/photo-1580077941997-a5898749d2a3?w=400&h=300&fit=crop', count: 145, description: 'Oxford of the East' },
-  { name: 'Jaipur', image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=400&h=300&fit=crop', count: 189, description: 'Pink City' },
+// Stats data
+const STATS = [
+  { value: '50K+', label: 'Happy Explorers' },
+  { value: '15', label: 'Cities' },
+  { value: '4.9', label: 'Avg Rating' },
+  { value: '10K+', label: 'Adventures' },
 ];
 
-// Animated text words
-const ANIMATED_WORDS = ['Assistance', 'Community', 'Support', 'Growth', 'Connection'];
-
-const categories = [
-  { icon: '🔧', label: 'Repairs', active: true },
-  { icon: '🧹', label: 'Cleaning', active: false },
-  { icon: '📚', label: 'Tutoring', active: false },
-  { icon: '🚚', label: 'Delivery', active: false },
-  { icon: '🏠', label: 'Home Help', active: false },
-  { icon: '💻', label: 'Tech Support', active: false },
-  { icon: '🚗', label: 'Transport', active: false },
-];
-
-const featuredServices = [
-  { id: 1, title: 'Home Repairs & Maintenance', location: 'Mumbai', price: 499, rating: 4.92, reviews: 128, image: 'https://images.unsplash.com/photo-1581578731548-c64649cc085f?w=600&h=400&fit=crop', instantBook: true },
-  { id: 2, title: 'Professional Cleaning Service', location: 'Delhi', price: 699, rating: 4.88, reviews: 94, image: 'https://images.unsplash.com/photo-1581578731548-c64649cc085f?w=600&h=400&fit=crop', instantBook: true },
-  { id: 3, title: 'Math & Science Tutoring', location: 'Bangalore', price: 399, rating: 4.95, reviews: 67, image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop', instantBook: false },
-  { id: 4, title: 'Moving & Delivery Help', location: 'Pune', price: 799, rating: 4.78, reviews: 45, image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&h=400&fit=crop', instantBook: true },
-];
-
-const topExperiences = [
-  { id: 1, title: 'Community Skill Exchange', location: 'Mumbai', price: 0, rating: 4.96, reviews: 234, image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop', category: 'Community' },
-  { id: 2, title: 'Local Guide Tours', location: 'Jaipur', price: 999, rating: 4.91, reviews: 189, image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600&h=400&fit=crop', category: 'Tours' },
-  { id: 3, title: 'Food & Cultural Experience', location: 'Delhi', price: 599, rating: 4.87, reviews: 312, image: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=600&h=400&fit=crop', category: 'Culture' },
-  { id: 4, title: 'Tech Help Sessions', location: 'Bangalore', price: 299, rating: 4.93, reviews: 156, image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop', category: 'Technology' },
-];
-
-const testimonials = [
-  { name: 'Priya S.', location: 'Mumbai', avatar: 'PS', rating: 5, text: 'Found an amazing tutor for my daughter. The community help is truly remarkable!' },
-  { name: 'Rahul M.', location: 'Delhi', avatar: 'RM', rating: 5, text: 'Got quick help with home repairs through HelpHive. The helper was professional and affordable.' },
-  { name: 'Anita K.', location: 'Bangalore', avatar: 'AK', rating: 5, text: 'Earned rewards by helping neighbors with tech support. Love the community spirit!' },
+// Features
+const FEATURES = [
+  { icon: Shield, title: 'Verified Hosts', desc: 'All hosts are background checked' },
+  { icon: Zap, title: 'Instant Booking', desc: 'Book in seconds, ride today' },
+  { icon: Trophy, title: 'Rewards Program', desc: 'Earn points & unlock perks' },
+  { icon: TrendingUp, title: 'Weekly Tournaments', desc: 'Compete & win prizes' },
 ];
 
 export default function HomePage() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState('Repairs');
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [searchCity, setSearchCity] = useState('');
-  const [showCityDropdown, setShowCityDropdown] = useState(false);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [checkIn, setCheckIn] = useState<Date | null>(null);
-  const [checkOut, setCheckOut] = useState<Date | null>(null);
-  const [showGuestPicker, setShowGuestPicker] = useState(false);
-  const [guests, setGuests] = useState({ adults: 1, children: 0 });
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Animate words
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentWordIndex((prev) => (prev + 1) % ANIMATED_WORDS.length);
-        setIsAnimating(false);
-      }, 300);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Get featured vehicles (top rated)
+  const featuredVehicles = [...sampleVehicles]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 4);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowCityDropdown(false);
-        setShowDatePicker(false);
-        setShowGuestPicker(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Get featured experiences
+  const featuredExperiences = [...sampleExperiences]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 4);
 
-  const filteredCities = CITIES_DATA.filter(city =>
-    city.name.toLowerCase().includes(searchCity.toLowerCase()) ||
-    city.description.toLowerCase().includes(searchCity.toLowerCase())
-  );
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (selectedCity) params.set('city', selectedCity);
-    if (checkIn) params.set('checkIn', checkIn.toISOString());
-    if (checkOut) params.set('checkOut', checkOut.toISOString());
-    params.set('guests', String(guests.adults + guests.children));
-    router.push(`/explore/vehicles?${params.toString()}`);
-  };
-
-  const selectCity = (cityName: string) => {
-    setSelectedCity(cityName);
-    setSearchCity(cityName);
-    setShowCityDropdown(false);
-  };
-
-  const handleDateChange = (type: 'checkIn' | 'checkOut', date: Date) => {
-    if (type === 'checkIn') {
-      setCheckIn(date);
-      if (checkOut && date > checkOut) setCheckOut(null);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/explore/vehicles?city=${encodeURIComponent(searchQuery.trim())}`);
     } else {
-      setCheckOut(date);
+      router.push('/explore/vehicles');
     }
   };
 
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Header />
 
       <main>
-        {/* NEW ATTRACTIVE HERO SECTION - Eye Catching with Animations */}
-        <section className="relative min-h-[90vh] lg:min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            {/* Floating Shapes */}
-            <div className="absolute top-20 left-10 w-64 h-64 bg-[#FF385C]/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#E61E4D]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        {/* HERO SECTION - Bold & Premium */}
+        <section className="relative min-h-[90vh] lg:min-h-[85vh] flex items-center justify-center overflow-hidden">
+          {/* Dynamic Background */}
+          <div className="absolute inset-0">
+            {/* Gradient Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E] via-[#16213E] to-[#2D2D44]" />
+
+            {/* Animated Gradient Orbs */}
+            <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-[#FF5722]/20 rounded-full blur-[150px] animate-pulse" />
+            <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#C6FF00]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-[#00BCD4]/5 rounded-full blur-[200px] animate-pulse" style={{ animationDelay: '2s' }} />
 
             {/* Grid Pattern */}
-            <div className="absolute inset-0 opacity-10" style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-              backgroundSize: '50px 50px'
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+              backgroundSize: '60px 60px'
             }} />
 
-            {/* Floating Icons */}
-            <div className="absolute top-32 right-20 text-6xl opacity-20 animate-bounce" style={{ animationDuration: '3s' }}>🛵</div>
-            <div className="absolute bottom-40 left-20 text-5xl opacity-20 animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🚗</div>
-            <div className="absolute top-1/3 right-1/4 text-4xl opacity-15 animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🏍️</div>
+            {/* Floating Elements */}
+            <div className="absolute top-32 right-[15%] text-7xl opacity-10 animate-float">🛵</div>
+            <div className="absolute bottom-40 left-[10%] text-6xl opacity-10 animate-float" style={{ animationDelay: '1.5s' }}>🏍️</div>
+            <div className="absolute top-1/3 right-[25%] text-5xl opacity-8 animate-float" style={{ animationDelay: '0.8s' }}>🚗</div>
+            <div className="absolute bottom-1/3 left-[20%] text-4xl opacity-6 animate-float" style={{ animationDelay: '2s' }}>⚡</div>
           </div>
 
           {/* Content */}
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            {/* Animated Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full mb-8 animate-fade-in">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-white/90 text-sm font-medium">India's #1 Community Help Platform</span>
+            {/* Premium Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full mb-8 border border-white/10 animate-fade-in">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C6FF00] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C6FF00]"></span>
+              </span>
+              <span className="text-white/90 text-sm font-medium">India's Premier TukTuk & Ride Platform</span>
             </div>
 
-            {/* Main Headline with Animated Words */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Get the Help You Need,
-              <span className="block mt-4">
-                <span className="relative inline-block">
-                  <span className="bg-gradient-to-r from-[#FF385C] to-[#E61E4D] bg-clip-text text-transparent">
-                    {ANIMATED_WORDS[currentWordIndex]}
-                  </span>
-                  <span className={`absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#FF385C] to-[#E61E4D] rounded-full transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`} />
-                </span>
-              </span>
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] animate-fade-in-up" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <span className="block">Ride Cities.</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FFD700]">Win Adventures.</span>
+              <span className="block">Discover India.</span>
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-white/70 mb-12 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Connect with local helpers, service providers, and community resources for all your needs
+            <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              Explore India's most vibrant cities with TukTuks, bikes, and local experiences.
+              Earn rewards. Compete in tournaments. Make every ride unforgettable.
             </p>
 
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-8 sm:gap-12 mb-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-              <div className="text-center">
-                <p className="text-3xl sm:text-4xl font-bold text-white">50K+</p>
-                <p className="text-white/60 text-sm">Happy Users</p>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div className="relative flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
+                <div className="flex-1 flex items-center px-6">
+                  <MapPin className="h-5 w-5 text-[#FF5722] shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Where do you want to explore?"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-5 bg-transparent text-[#1A1A2E] placeholder:text-gray-400 outline-none text-lg"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="m-2 px-8 py-4 bg-gradient-to-r from-[#FF5722] to-[#FF8A65] text-white font-semibold rounded-full hover:shadow-[0_0_30px_rgba(255,87,34,0.4)] transition-all duration-300 flex items-center gap-2"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="hidden sm:inline">Explore</span>
+                </button>
               </div>
-              <div className="text-center">
-                <p className="text-3xl sm:text-4xl font-bold text-white">15</p>
-                <p className="text-white/60 text-sm">Cities</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl sm:text-4xl font-bold text-white">4.9</p>
-                <p className="text-white/60 text-sm">Avg Rating</p>
-              </div>
+            </form>
+
+            {/* Quick City Pills */}
+            <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              {['Goa', 'Jaipur', 'Mumbai', 'Delhi', 'Bangalore'].map((city) => (
+                <button
+                  key={city}
+                  onClick={() => router.push(`/explore/vehicles?city=${city}`)}
+                  className="px-4 py-2 bg-white/10 backdrop-blur-xl text-white/90 rounded-full text-sm font-medium border border-white/10 hover:bg-white/20 transition-all"
+                >
+                  {city}
+                </button>
+              ))}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-              <Link
-                href="/explore/vehicles"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF385C] hover:bg-[#E61E4D] text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-[#FF385C]/25"
-              >
-                Find Help
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/host/onboarding"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold rounded-full transition-all duration-300 border border-white/20"
-              >
-                Become a Helper
-              </Link>
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-8 sm:gap-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              {STATS.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="text-3xl sm:text-4xl font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>{stat.value}</p>
+                  <p className="text-white/60 text-sm">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Scroll Indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-1">
+            <div className="w-8 h-12 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
               <div className="w-1.5 h-3 bg-white/60 rounded-full animate-pulse" />
             </div>
           </div>
         </section>
 
-        {/* SECONDARY HERO - Airbnb Style Search (Moved Below) */}
-        <section className="relative -mt-8 lg:-mt-12 z-20">
-          {/* Airbnb-style Search Bar */}
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-full shadow-[0_2px_20px_rgba(0,0,0,0.15)] p-2 flex flex-col lg:flex-row" ref={dropdownRef}>
-              {/* Where - City Selector */}
-              <div className="relative flex-1 lg:border-r border-gray-200">
-                <button
-                  onClick={() => { setShowCityDropdown(!showCityDropdown); setShowDatePicker(false); setShowGuestPicker(false); }}
-                  className="w-full px-6 py-4 text-left hover:bg-gray-50 rounded-full lg:rounded-none lg:rounded-l-full transition-colors"
+        {/* FEATURES SECTION */}
+        <section className="py-20 lg:py-28 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] mb-4" style={{ fontFamily: 'Sora, sans-serif' }}>
+                Why Choose HELPHIVE?
+              </h2>
+              <p className="text-[#4A4A6A] text-lg max-w-2xl mx-auto">
+                We're not just another ride platform. We're building a community of explorers who earn, compete, and discover together.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {FEATURES.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className="group p-8 rounded-3xl bg-[#FAFAFA] hover:bg-gradient-to-br hover:from-[#FF5722]/5 hover:to-[#FF8A65]/5 transition-all duration-300 border border-transparent hover:border-[#FF5722]/20"
                 >
-                  <label className="block text-xs font-semibold text-gray-900 mb-0.5">Where</label>
-                  <input
-                    type="text"
-                    placeholder="Search destinations"
-                    value={searchCity}
-                    onChange={(e) => { setSearchCity(e.target.value); setShowCityDropdown(true); }}
-                    onClick={() => setShowCityDropdown(true)}
-                    className="w-full text-sm text-gray-600 placeholder:text-gray-400 bg-transparent outline-none"
-                    readOnly
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#FF8A65] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <feature.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#1A1A2E] mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>{feature.title}</h3>
+                  <p className="text-[#4A4A6A]">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CITIES SECTION */}
+        <section className="py-20 lg:py-28 bg-[#FAFAFA]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <Badge variant="accent" size="sm" className="mb-3">EXPLORE</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E]" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  Explore Top Cities
+                </h2>
+                <p className="text-[#4A4A6A] mt-2">Handpicked destinations with the best rides & experiences</p>
+              </div>
+              <Link href="/cities" className="hidden sm:flex items-center gap-2 text-[#FF5722] font-semibold hover:gap-3 transition-all">
+                View all cities <ChevronRight className="h-5 w-5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              {CITIES_DATA.slice(0, 6).map((city, index) => (
+                <Link
+                  key={city.slug}
+                  href={`/explore/vehicles?city=${city.name}`}
+                  className={`group relative rounded-3xl overflow-hidden ${index === 0 ? 'col-span-2 row-span-2 aspect-square lg:aspect-auto' : 'aspect-[4/3]'}`}
+                >
+                  <Image
+                    src={city.image}
+                    alt={city.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                </button>
-
-                {/* City Dropdown */}
-                {showCityDropdown && (
-                  <div className="absolute top-full left-0 lg:left-0 mt-2 w-full lg:w-[400px] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 max-h-[400px] overflow-y-auto">
-                    <div className="p-3 border-b border-gray-100">
-                      <input
-                        type="text"
-                        placeholder="Search cities..."
-                        value={searchCity}
-                        onChange={(e) => setSearchCity(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF385C]/20"
-                        autoFocus
-                      />
-                    </div>
-                    <div className="p-2">
-                      {filteredCities.length === 0 ? (
-                        <p className="text-center text-gray-500 py-4">No cities found</p>
-                      ) : (
-                        filteredCities.map((city) => (
-                          <button
-                            key={city.name}
-                            onClick={() => selectCity(city.name)}
-                            className="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-                          >
-                            <img src={city.image} alt={city.name} className="w-14 h-14 rounded-xl object-cover" />
-                            <div className="flex-1 text-left">
-                              <p className="font-semibold text-gray-900">{city.name}</p>
-                              <p className="text-sm text-gray-500">{city.description}</p>
-                            </div>
-                            <span className="text-sm text-gray-400">{city.count} rides</span>
-                          </button>
-                        ))
-                      )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 lg:bottom-6 lg:left-6 right-4">
+                    <h3 className="text-white text-xl lg:text-2xl font-bold" style={{ fontFamily: 'Sora, sans-serif' }}>{city.name}</h3>
+                    <p className="text-white/80 text-sm mt-1">{city.description}</p>
+                    <div className="flex items-center gap-4 mt-3">
+                      <span className="text-white/90 text-sm">{city.vehicleCount} vehicles</span>
+                      <span className="text-white/90 text-sm">{city.experienceCount} experiences</span>
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* When - Date Picker */}
-              <div className="relative flex-1 lg:border-r border-gray-200">
-                <button
-                  onClick={() => { setShowDatePicker(!showDatePicker); setShowCityDropdown(false); setShowGuestPicker(false); }}
-                  className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors"
-                >
-                  <label className="block text-xs font-semibold text-gray-900 mb-0.5">When</label>
-                  <span className="text-sm text-gray-600">
-                    {checkIn && checkOut
-                      ? `${formatDate(checkIn)} - ${formatDate(checkOut)}`
-                      : checkIn
-                        ? `${formatDate(checkIn)} - Add date`
-                        : 'Add dates'}
-                  </span>
-                </button>
-
-                {/* Date Picker Dropdown */}
-                {showDatePicker && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50 w-[320px]">
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-900 mb-2">Check-in</label>
-                        <input
-                          type="date"
-                          min={today.toISOString().split('T')[0]}
-                          value={checkIn ? checkIn.toISOString().split('T')[0] : ''}
-                          onChange={(e) => handleDateChange('checkIn', new Date(e.target.value))}
-                          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF385C]/20"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-900 mb-2">Check-out</label>
-                        <input
-                          type="date"
-                          min={checkIn ? new Date(checkIn.getTime() + 86400000).toISOString().split('T')[0] : tomorrow.toISOString().split('T')[0]}
-                          value={checkOut ? checkOut.toISOString().split('T')[0] : ''}
-                          onChange={(e) => handleDateChange('checkOut', new Date(e.target.value))}
-                          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF385C]/20"
-                        />
-                      </div>
+                  <div className="absolute top-4 right-4">
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center group-hover:bg-[#FF5722] transition-colors">
+                      <ArrowRight className="h-5 w-5 text-white" />
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Who - Guest Selector */}
-              <div className="relative flex-1">
-                <button
-                  onClick={() => { setShowGuestPicker(!showGuestPicker); setShowCityDropdown(false); setShowDatePicker(false); }}
-                  className="w-full px-6 py-4 text-left hover:bg-gray-50 lg:rounded-none lg:rounded-r-full transition-colors"
-                >
-                  <label className="block text-xs font-semibold text-gray-900 mb-0.5">Who</label>
-                  <span className="text-sm text-gray-600">
-                    {guests.adults + guests.children > 1
-                      ? `${guests.adults} adults${guests.children > 0 ? `, ${guests.children} children` : ''}`
-                      : 'Add guests'}
-                  </span>
-                </button>
-
-                {/* Guest Picker Dropdown */}
-                {showGuestPicker && (
-                  <div className="absolute top-full right-0 lg:right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50 w-[300px]">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900">Adults</p>
-                          <p className="text-sm text-gray-500">Ages 13+</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => setGuests({ ...guests, adults: Math.max(1, guests.adults - 1) })}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 disabled:opacity-50"
-                            disabled={guests.adults <= 1}
-                          >
-                            -
-                          </button>
-                          <span className="w-6 text-center font-medium">{guests.adults}</span>
-                          <button
-                            onClick={() => setGuests({ ...guests, adults: guests.adults + 1 })}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900">Children</p>
-                          <p className="text-sm text-gray-500">Ages 2-12</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => setGuests({ ...guests, children: Math.max(0, guests.children - 1) })}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 disabled:opacity-50"
-                            disabled={guests.children <= 0}
-                          >
-                            -
-                          </button>
-                          <span className="w-6 text-center font-medium">{guests.children}</span>
-                          <button
-                            onClick={() => setGuests({ ...guests, children: guests.children + 1 })}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Search Button */}
-              <button
-                onClick={handleSearch}
-                className="flex items-center justify-center gap-2 px-8 py-4 bg-[#FF385C] hover:bg-[#E61E4D] text-white font-semibold rounded-full lg:rounded-none lg:rounded-r-full transition-all mx-2 lg:mx-0 mt-2 lg:mt-0"
-              >
-                <Search className="h-5 w-5" />
-                <span className="hidden sm:inline">Search</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Categories - Airbnb Style Horizontal Scroll */}
-        <section className="py-8 lg:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.label}
-                  onClick={() => setActiveCategory(cat.label)}
-                  className={`category-pill flex-shrink-0 ${activeCategory === cat.label ? 'active' : ''}`}
-                >
-                  <span>{cat.icon}</span>
-                  <span>{cat.label}</span>
-                </button>
+                </Link>
               ))}
-              <button className="category-pill flex-shrink-0 ml-auto">
-                <SlidersHorizontal className="h-4 w-4" />
-                <span>Filters</span>
-              </button>
             </div>
           </div>
         </section>
 
-        {/* All Cities Grid - Live Cities with Data */}
-        <section className="py-8 lg:py-12 bg-[var(--color-surface-muted)]">
+        {/* FEATURED VEHICLES SECTION */}
+        <section className="py-20 lg:py-28 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[var(--color-text)]">Explore All Cities</h2>
-              <span className="text-sm text-[var(--color-text-secondary)]">{CITIES_DATA.length} destinations</span>
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <Badge variant="primary" size="sm" className="mb-3">VEHICLES</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E]" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  Top Rated Rides
+                </h2>
+                <p className="text-[#4A4A6A] mt-2">Premium vehicles with verified hosts</p>
+              </div>
+              <Link href="/explore/vehicles" className="hidden sm:flex items-center gap-2 text-[#FF5722] font-semibold hover:gap-3 transition-all">
+                View all <ChevronRight className="h-5 w-5" />
+              </Link>
             </div>
 
-            {/* City Grid - Responsive */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {CITIES_DATA.map((city, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredVehicles.map((vehicle) => (
                 <Link
-                  key={city.name}
-                  href={`/explore/vehicles?city=${encodeURIComponent(city.name)}`}
-                  className="group animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.03}s` }}
+                  key={vehicle.id}
+                  href={`/explore/vehicles/${vehicle.id}`}
+                  className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(26,26,46,0.06)] hover:shadow-[0_12px_40px_rgba(26,26,46,0.12)] transition-all duration-300 hover:-translate-y-2"
                 >
-                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2 img-zoom">
-                    <img
-                      src={city.image}
-                      alt={city.name}
-                      className="w-full h-full object-cover"
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={vehicle.image}
+                      alt={`${vehicle.brand} ${vehicle.model}`}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <h3 className="font-semibold text-white text-lg">{city.name}</h3>
-                      <p className="text-white/80 text-sm">{city.description}</p>
-                    </div>
+                    <Badge variant="primary" size="sm" className="absolute top-3 left-3">{vehicle.type.replace('_', ' ')}</Badge>
+                    {vehicle.hostVerified && (
+                      <Badge variant="success" size="sm" className="absolute top-3 right-3">
+                        <Shield className="h-3 w-3" /> Verified
+                      </Badge>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[var(--color-text)]">{city.count} rides</span>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Explore →</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Services - Airbnb Card Grid */}
-        <section className="py-8 lg:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--color-text)]">Featured Services</h2>
-                <p className="text-sm text-[var(--color-text-secondary)]">Popular help & services near you</p>
-              </div>
-              <Link href="/explore/vehicles" className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text)]">
-                View all
-              </Link>
-            </div>
-
-            {/* Airbnb Grid - 4 columns on desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredServices.map((service, index) => (
-                <Link
-                  key={service.id}
-                  href={`/explore/vehicles?service=${service.id}`}
-                  className="group animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <div className="card">
-                    {/* Image Container */}
-                    <div className="relative aspect-[4/3] img-zoom">
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="w-full h-full object-cover"
-                      />
-                      {service.instantBook && (
-                        <div className="absolute top-3 left-3">
-                          <span className="badge badge-primary font-medium">Available</span>
-                        </div>
-                      )}
-                      {/* Heart Button */}
-                      <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition heart-btn">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-[var(--color-text)] line-clamp-1">{service.title}</h3>
-                        <div className="flex items-center gap-1">
-                          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                          </svg>
-                          <span className="text-sm font-medium">{service.rating}</span>
-                          <span className="text-sm text-[var(--color-text-muted)]">({service.reviews})</span>
-                        </div>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-bold text-[#1A1A2E] text-lg" style={{ fontFamily: 'Sora, sans-serif' }}>{vehicle.brand} {vehicle.model}</h3>
+                        <p className="text-[#4A4A6A] text-sm mt-1 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {vehicle.city}
+                        </p>
                       </div>
-                      <p className="text-sm text-[var(--color-text-secondary)] mb-2">{service.location}</p>
-                      <p className="text-sm font-semibold">
-                        <span className="text-[var(--color-text)]">₹{service.price}</span>
-                        <span className="font-normal text-[var(--color-text-secondary)]"> / hr</span>
-                      </p>
+                      <div className="flex items-center gap-1 bg-[#FFF8E1] px-2 py-1 rounded-full">
+                        <Star className="h-4 w-4 fill-[#FFD700] text-[#FFD700]" />
+                        <span className="font-semibold text-sm">{vehicle.rating}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 mt-4 text-sm text-[#4A4A6A]">
+                      <span className="flex items-center gap-1"><Users className="h-4 w-4" />{vehicle.capacity}</span>
+                      <span>{vehicle.transmission}</span>
+                      <span>{vehicle.fuelType}</span>
+                    </div>
+                    <div className="flex items-end justify-between mt-4 pt-4 border-t border-[#F0F0F5]">
+                      <div>
+                        <span className="text-2xl font-bold text-[#FF5722]">{formatCurrency(vehicle.pricePerHour)}</span>
+                        <span className="text-[#4A4A6A] text-sm">/hour</span>
+                      </div>
+                      <span className="text-sm text-[#4A4A6A]">{vehicle.reviewCount} reviews</span>
                     </div>
                   </div>
                 </Link>
@@ -538,57 +307,59 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Top Experiences */}
-        <section className="py-8 lg:py-12 bg-[var(--color-surface-muted)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-6">
+        {/* FEATURED EXPERIENCES SECTION */}
+        <section className="py-20 lg:py-28 bg-gradient-to-br from-[#1A1A2E] via-[#16213E] to-[#2D2D44] relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF5722]/10 rounded-full blur-[150px]" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C6FF00]/10 rounded-full blur-[100px]" />
+          </div>
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-12">
               <div>
-                <h2 className="text-xl font-semibold text-[var(--color-text)]">Top Experiences</h2>
-                <p className="text-sm text-[var(--color-text-secondary)]">Curated tours with local experts</p>
+                <Badge variant="accent" size="sm" className="mb-3">EXPERIENCES</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  Local Adventures
+                </h2>
+                <p className="text-white/60 mt-2">Curated experiences with passionate local guides</p>
               </div>
-              <Link href="/explore/experiences" className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text)]">
-                View all
+              <Link href="/explore/experiences" className="hidden sm:flex items-center gap-2 text-[#C6FF00] font-semibold hover:gap-3 transition-all">
+                View all <ChevronRight className="h-5 w-5" />
               </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {topExperiences.map((exp, index) => (
+              {featuredExperiences.map((exp) => (
                 <Link
                   key={exp.id}
-                  href={`/experiences/${exp.id}`}
-                  className="group animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
+                  href={`/explore/experiences/${exp.id}`}
+                  className="group bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 hover:bg-white/10 transition-all duration-300"
                 >
-                  <div className="card">
-                    <div className="relative aspect-[4/3] img-zoom">
-                      <img
-                        src={exp.image}
-                        alt={exp.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span className="badge badge-primary font-medium">{exp.category}</span>
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={exp.image}
+                      alt={exp.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <Badge variant="primary" size="sm" className="absolute top-3 left-3">{exp.category}</Badge>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-1 text-white/80 text-sm">
+                        <Star className="h-4 w-4 fill-[#FFD700] text-[#FFD700]" />
+                        <span>{exp.rating}</span>
+                        <span className="text-white/50">({exp.reviewCount})</span>
                       </div>
-                      <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition heart-btn">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </button>
                     </div>
-                    <div className="p-3">
-                      <div className="flex items-center gap-1 mb-1">
-                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                        <span className="text-sm font-medium">{exp.rating}</span>
-                        <span className="text-sm text-[var(--color-text-muted)]">({exp.reviews})</span>
-                      </div>
-                      <h3 className="font-semibold text-[var(--color-text)] line-clamp-1">{exp.title}</h3>
-                      <p className="text-sm text-[var(--color-text-secondary)] mb-2">{exp.location}</p>
-                      <p className="text-sm font-semibold">
-                        <span className="text-[var(--color-text)]">₹{exp.price}</span>
-                        <span className="font-normal text-[var(--color-text-secondary)]"> / person</span>
-                      </p>
+                    <h3 className="font-bold text-white text-lg mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>{exp.title}</h3>
+                    <p className="text-white/60 text-sm mb-4 flex items-center gap-1">
+                      <MapPin className="h-3 w-3" /> {exp.city} • {exp.duration}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                      <span className="text-xl font-bold text-[#C6FF00]">{formatCurrency(exp.price)}</span>
+                      <span className="text-white/60 text-sm">/person</span>
                     </div>
                   </div>
                 </Link>
@@ -597,91 +368,50 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CTA Banner - Airbnb Style */}
-        <section className="py-8 lg:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/cities" className="block relative rounded-[var(--radius-2xl)] overflow-hidden group">
-              <div className="aspect-[3/1] bg-gradient-to-r from-[#FF385C] to-[#FF5A5F]">
-                <img
-                  src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1200&h=400&fit=crop"
-                  alt="Explore cities"
-                  className="w-full h-full object-cover mix-blend-overlay opacity-40"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <h2 className="text-2xl lg:text-4xl font-semibold mb-2">Explore India's Best Cities</h2>
-                    <p className="text-lg text-white/80 mb-4">From beach vibes to heritage trails - find your next adventure</p>
-                    <span className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[var(--color-text)] rounded-[var(--radius-md)] font-semibold group-hover:bg-white/90 transition">
-                      Start Exploring
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-                      </svg>
-                    </span>
-                  </div>
+        {/* CTA SECTION */}
+        <section className="py-20 lg:py-28 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="relative p-12 lg:p-16 rounded-[2rem] overflow-hidden bg-gradient-to-br from-[#FF5722] to-[#FF8A65]">
+              {/* Decorative elements */}
+              <div className="absolute top-0 left-0 w-full h-full">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl" />
+              </div>
+
+              <div className="relative z-10">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  Ready to Start Exploring?
+                </h2>
+                <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
+                  Join thousands of explorers discovering India. List your vehicle or guide experiences and start earning today.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link href="/explore/vehicles">
+                    <Button size="xl" variant="glass" className="w-full sm:w-auto bg-white text-[#FF5722] hover:bg-white/90">
+                      Find a Ride <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/host/onboarding">
+                    <Button size="xl" variant="accent" className="w-full sm:w-auto">
+                      Become a Host
+                    </Button>
+                  </Link>
                 </div>
               </div>
-            </Link>
-          </div>
-        </section>
-
-        {/* Testimonials - Airbnb Style */}
-        <section className="py-8 lg:py-12 bg-[var(--color-surface-muted)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-xl font-semibold text-[var(--color-text)] mb-6">What Our Users Say</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={testimonial.name}
-                  className="p-6 bg-white rounded-[var(--radius-lg)] animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24" style={{ color: 'var(--color-text)' }}>
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    ))}
-                  </div>
-
-                  <p className="text-[var(--color-text-secondary)] mb-4">"{testimonial.text}"</p>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white" style={{ background: 'var(--color-primary)' }}>
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-[var(--color-text)]">{testimonial.name}</p>
-                      <p className="text-sm text-[var(--color-text-muted)]">{testimonial.location}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-8 border-t border-[var(--color-border-light)]">
+        {/* FINAL STATS */}
+        <section className="py-16 border-t border-[#F0F0F5]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-              <div>
-                <p className="text-2xl lg:text-3xl font-semibold text-[var(--color-text)]">50K+</p>
-                <p className="text-sm text-[var(--color-text-secondary)]">Happy Users</p>
-              </div>
-              <div>
-                <p className="text-2xl lg:text-3xl font-semibold text-[var(--color-text)]">15</p>
-                <p className="text-sm text-[var(--color-text-secondary)]">Cities</p>
-              </div>
-              <div>
-                <p className="text-2xl lg:text-3xl font-semibold text-[var(--color-text)]">4.9</p>
-                <p className="text-sm text-[var(--color-text-secondary)]">Average Rating</p>
-              </div>
-              <div>
-                <p className="text-2xl lg:text-3xl font-semibold text-[var(--color-text)]">10K+</p>
-                <p className="text-sm text-[var(--color-text-secondary)]">Listings</p>
-              </div>
+              {STATS.map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-3xl lg:text-4xl font-bold text-[#FF5722]" style={{ fontFamily: 'Sora, sans-serif' }}>{stat.value}</p>
+                  <p className="text-[#4A4A6A] mt-1">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -689,18 +419,15 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* Mobile Sticky CTA - Airbnb Style */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-[var(--color-border-light)] md:hidden z-40">
+      {/* Mobile Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-[#F0F0F5] md:hidden z-40">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-[var(--color-text)]">India's #1 Local Explorer</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">50K+ happy users</p>
+            <p className="font-bold text-[#1A1A2E]">HELPHIVE</p>
+            <p className="text-sm text-[#4A4A6A]">India's #1 Ride Platform</p>
           </div>
-          <Link
-            href="/explore/vehicles"
-            className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-[var(--radius-md)] font-semibold text-sm"
-          >
-            Explore
+          <Link href="/explore/vehicles">
+            <Button size="lg">Explore Now</Button>
           </Link>
         </div>
       </div>

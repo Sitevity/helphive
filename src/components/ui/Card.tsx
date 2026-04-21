@@ -5,24 +5,28 @@ import { cn } from '@/lib/utils';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'interactive';
+  variant?: 'default' | 'interactive' | 'glass';
+  glow?: boolean;
 }
 
 const paddingStyles = {
   none: '',
-  sm: 'p-3',
-  md: 'p-4',
+  sm: 'p-4',
+  md: 'p-5',
   lg: 'p-6',
 };
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, padding = 'none', variant = 'default', ...props }, ref) => (
+  ({ className, padding = 'none', variant = 'default', glow, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'rounded-[var(--radius-lg)] bg-white overflow-hidden',
+        'rounded-2xl bg-white overflow-hidden',
         paddingStyles[padding],
-        variant === 'interactive' && 'hover:shadow-[var(--shadow-card-hover)] transition-shadow cursor-pointer',
+        variant === 'default' && 'shadow-[0_4px_20px_rgba(26,26,46,0.06)]',
+        variant === 'interactive' && 'shadow-[0_4px_20px_rgba(26,26,46,0.06)] hover:shadow-[0_12px_40px_rgba(26,26,46,0.12)] hover:-translate-y-1 transition-all duration-300 cursor-pointer',
+        variant === 'glass' && 'bg-white/70 backdrop-blur-xl border border-white/30',
+        glow && 'shadow-[0_0_40px_rgba(255,87,34,0.2)]',
         className
       )}
       {...props}
@@ -52,34 +56,31 @@ const ListingCard = forwardRef<HTMLDivElement, ListingCardProps>(
         className={cn('group cursor-pointer', className)}
         {...props}
       >
-        {/* Image Container - Airbnb Style */}
-        <div className="relative aspect-[4/3] rounded-[var(--radius-lg)] overflow-hidden bg-[var(--color-surface-muted)] img-zoom mb-2">
+        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#F5F5F7] mb-3">
           <img
             src={image}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-
-          {/* Badge */}
           {badge && (
             <div className="absolute top-3 left-3">
-              <span className="badge badge-primary font-medium">{badge}</span>
+              <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[#FF5722] font-semibold text-xs shadow-lg">
+                {badge}
+              </span>
             </div>
           )}
-
-          {/* Save Button - Airbnb Style */}
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onSave?.();
             }}
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/70 hover:bg-white transition heart-btn"
+            className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white/70 hover:bg-white transition shadow-lg"
           >
             <svg
               className={cn(
-                'w-5 h-5 transition',
-                isSaved ? 'fill-current text-[var(--color-primary)]' : 'text-[var(--color-text)]'
+                'w-5 h-5 transition-colors',
+                isSaved ? 'fill-[#FF1744] text-[#FF1744]' : 'text-[#1A1A2E]'
               )}
               fill={isSaved ? 'currentColor' : 'none'}
               stroke="currentColor"
@@ -94,34 +95,27 @@ const ListingCard = forwardRef<HTMLDivElement, ListingCardProps>(
             </svg>
           </button>
         </div>
-
-        {/* Info - Airbnb Style */}
-        <div className="px-0.5">
-          {/* Rating & Location Row */}
+        <div className="px-1">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold text-[var(--color-text)] line-clamp-1">{title}</h3>
+            <h3 className="font-semibold text-[#1A1A2E] line-clamp-1">{title}</h3>
             {rating && (
               <div className="flex items-center gap-1 ml-2 flex-shrink-0">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
-                <span className="text-sm font-medium">{rating.toFixed(1)}</span>
+                <span className="text-sm font-semibold text-[#1A1A2E]">{rating.toFixed(1)}</span>
                 {reviewCount && (
-                  <span className="text-sm text-[var(--color-text-muted)]">({reviewCount})</span>
+                  <span className="text-sm text-[#8888A8]">({reviewCount})</span>
                 )}
               </div>
             )}
           </div>
-
-          {/* Location */}
           {location && (
-            <p className="text-sm text-[var(--color-text-secondary)] mb-1">{location}</p>
+            <p className="text-sm text-[#4A4A6A] mb-1">{location}</p>
           )}
-
-          {/* Price */}
           <p className="text-sm">
-            <span className="font-semibold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
-            <span className="text-[var(--color-text-secondary)]"> / day</span>
+            <span className="font-bold text-[#FF5722]">₹{price.toLocaleString()}</span>
+            <span className="text-[#8888A8]"> / day</span>
           </p>
         </div>
       </div>

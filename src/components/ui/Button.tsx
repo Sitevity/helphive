@@ -6,26 +6,28 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
   {
     variants: {
       variant: {
-        primary: 'text-white hover:opacity-90 active:scale-[0.98]',
-        secondary: 'text-[var(--color-text)] bg-[var(--color-surface-muted)] hover:bg-[var(--color-border)]',
-        outline: 'border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
-        ghost: 'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
-        danger: 'text-white hover:opacity-90',
-        success: 'text-white hover:opacity-90',
+        primary: 'text-white bg-gradient-to-r from-[#FF5722] to-[#FF8A65] hover:shadow-[0_0_30px_rgba(255,87,34,0.4)] hover:-translate-y-0.5',
+        secondary: 'text-white bg-gradient-to-r from-[#1A1A2E] to-[#16213E] hover:shadow-lg hover:-translate-y-0.5',
+        accent: 'text-[#1A1A2E] bg-gradient-to-r from-[#C6FF00] to-[#EEFF66] hover:shadow-[0_0_20px_rgba(198,255,0,0.4)] hover:-translate-y-0.5',
+        outline: 'border-2 border-[#FF5722] text-[#FF5722] hover:bg-[#FF5722] hover:text-white',
+        ghost: 'text-[#1A1A2E] hover:bg-[#F5F5F7]',
+        danger: 'text-white bg-gradient-to-r from-[#FF1744] to-[#FF5252]',
+        success: 'text-white bg-gradient-to-r from-[#00C853] to-[#69F0AE]',
+        glass: 'text-white bg-white/20 backdrop-blur-xl border border-white/30 hover:bg-white/30',
       },
       size: {
-        sm: 'h-8 px-3 text-sm rounded-[var(--radius-md)]',
-        md: 'h-10 px-4 text-sm rounded-[var(--radius-lg)]',
-        lg: 'h-12 px-6 text-base rounded-[var(--radius-lg)]',
-        xl: 'h-14 px-8 text-lg rounded-[var(--radius-xl)]',
-        icon: 'h-10 w-10 rounded-[var(--radius-lg)]',
-        'icon-sm': 'h-8 w-8 rounded-[var(--radius-md)]',
-        'icon-lg': 'h-12 w-12 rounded-[var(--radius-xl)]',
-        full: 'w-full h-12 text-base rounded-[var(--radius-lg)]',
+        sm: 'h-9 px-4 text-sm rounded-[20px]',
+        md: 'h-11 px-5 text-sm rounded-[20px]',
+        lg: 'h-12 px-6 text-base rounded-[20px]',
+        xl: 'h-14 px-8 text-lg rounded-[20px]',
+        icon: 'h-11 w-11 rounded-[20px]',
+        'icon-sm': 'h-9 w-9 rounded-[16px]',
+        'icon-lg': 'h-12 w-12 rounded-[24px]',
+        full: 'w-full h-12 text-base rounded-[20px]',
       },
     },
     defaultVariants: {
@@ -61,10 +63,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          buttonVariants({ variant, size, className }),
-          variant === 'primary' && 'shadow-sm',
-          variant === 'danger' && 'bg-[var(--color-error)]',
-          variant === 'success' && 'bg-[var(--color-success)]'
+          buttonVariants({ variant, size, className })
         )}
         ref={ref}
         disabled={disabled || isLoading}

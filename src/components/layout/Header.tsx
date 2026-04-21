@@ -99,12 +99,14 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo with Bee */}
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-9 h-9 rounded-[var(--radius-lg)] flex items-center justify-center" style={{ background: 'var(--color-primary)' }}>
-              <span className="text-white text-xl">🐝</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#FF5722] to-[#FF8A65] shadow-lg">
+              <span className="text-white text-xl">🛵</span>
             </div>
-            <span className="text-xl font-bold text-[var(--color-text)]">HelpHive</span>
+            <span className="text-xl font-bold text-[#1A1A2E]" style={{ fontFamily: 'Sora, sans-serif' }}>
+              HELP<span className="text-[#FF5722]">HIVE</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -262,10 +264,10 @@ export function Header() {
               </>
             ) : (
               <>
-                <button onClick={() => router.push('/auth/login')} className="px-4 py-2 text-sm font-semibold text-[var(--color-text)] hover:bg-[var(--color-surface-muted)] rounded-full transition">
+                <button onClick={() => router.push('/auth/login')} className="px-4 py-2 text-sm font-semibold text-[#1A1A2E] hover:bg-[#F5F5F7] rounded-full transition">
                   Log in
                 </button>
-                <button onClick={() => router.push('/auth/register')} className="px-4 py-2 text-sm font-semibold text-white rounded-full transition hover:opacity-90" style={{ background: 'var(--color-primary)' }}>
+                <button onClick={() => router.push('/auth/register')} className="px-4 py-2 text-sm font-semibold text-white rounded-full transition hover:shadow-lg hover:shadow-[#FF5722]/20" style={{ background: 'linear-gradient(135deg, #FF5722 0%, #FF8A65 100%)' }}>
                   Sign up
                 </button>
               </>
