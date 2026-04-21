@@ -23,10 +23,10 @@ export default function CitiesPage() {
 
       <main className="pt-20 lg:pt-24">
         {/* Hero */}
-        <section className="relative bg-gradient-to-br from-[#1A1A2E] via-[#16213E] to-[#2D2D44] py-16 lg:py-24">
+        <section className="relative bg-gradient-to-br from-[#4A00E0] via-[#7B2CBF] to-[#1A1A2E] py-16 lg:py-24">
           <div className="absolute inset-0">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#FF5722]/10 rounded-full blur-[150px]" />
-            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C6FF00]/10 rounded-full blur-[100px]" />
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#8B5CF6]/20 rounded-full blur-[150px]" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#A78BFA]/15 rounded-full blur-[100px]" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -46,7 +46,7 @@ export default function CitiesPage() {
                   placeholder="Search cities..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4 rounded-full bg-white text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#FF5722] shadow-2xl text-lg"
+                  className="w-full pl-14 pr-6 py-4 rounded-full bg-white text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#8B5CF6] shadow-2xl text-lg"
                 />
               </div>
             </div>

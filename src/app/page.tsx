@@ -56,17 +56,17 @@ export default function HomePage() {
       <Header />
 
       <main>
-        {/* HERO SECTION - Bold & Premium */}
+        {/* HERO SECTION - Bold & Premium with Violet Theme */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-24">
           {/* Dynamic Background */}
           <div className="absolute inset-0">
-            {/* Gradient Base */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E] via-[#16213E] to-[#2D2D44]" />
+            {/* Violet Gradient Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4A00E0] via-[#7B2CBF] to-[#1A1A2E]" />
 
-            {/* Animated Gradient Orbs */}
-            <div className="absolute top-[-200px] left-[-200px] w-[900px] h-[900px] bg-[#FF5722]/20 rounded-full blur-[200px] animate-pulse" />
-            <div className="absolute bottom-[-200px] right-[-200px] w-[700px] h-[700px] bg-[#C6FF00]/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-[#00BCD4]/5 rounded-full blur-[250px] animate-pulse" style={{ animationDelay: '2s' }} />
+            {/* Violet Animated Orbs */}
+            <div className="absolute top-[-200px] left-[-200px] w-[900px] h-[900px] bg-[#8B5CF6]/30 rounded-full blur-[200px] animate-pulse" />
+            <div className="absolute bottom-[-200px] right-[-200px] w-[700px] h-[700px] bg-[#A78BFA]/20 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-[#C4B5FD]/10 rounded-full blur-[250px] animate-pulse" style={{ animationDelay: '2s' }} />
 
             {/* Grid Pattern */}
             <div className="absolute inset-0 opacity-[0.03]" style={{
@@ -86,8 +86,8 @@ export default function HomePage() {
             {/* Premium Badge */}
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-xl rounded-full mb-10 border border-white/10 animate-fade-in">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C6FF00] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#C6FF00]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#A78BFA] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#A78BFA]"></span>
               </span>
               <span className="text-white/90 text-sm font-medium tracking-wide">India's Premier TukTuk & Ride Platform</span>
             </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
             {/* Main Headline */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-[1.05] animate-fade-in-up" style={{ fontFamily: 'Sora, sans-serif' }}>
               <span className="block mb-3">Ride Cities.</span>
-              <span className="block mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FFD700]">Win Adventures.</span>
+              <span className="block mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#C4B5FD]">Win Adventures.</span>
               <span className="block">Discover India.</span>
             </h1>
 
@@ -109,7 +109,7 @@ export default function HomePage() {
             <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-14 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <div className="relative flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
                 <div className="flex-1 flex items-center px-8 py-5">
-                  <MapPin className="h-6 w-6 text-[#FF5722] shrink-0" />
+                  <MapPin className="h-6 w-6 text-[#8B5CF6] shrink-0" />
                   <input
                     type="text"
                     placeholder="Where do you want to explore?"
@@ -120,7 +120,7 @@ export default function HomePage() {
                 </div>
                 <button
                   type="submit"
-                  className="m-2 mr-2 px-10 py-5 bg-gradient-to-r from-[#FF5722] to-[#FF8A65] text-white font-bold rounded-full hover:shadow-[0_0_40px_rgba(255,87,34,0.5)] transition-all duration-300 flex items-center gap-3 text-lg"
+                  className="m-2 mr-2 px-10 py-5 bg-gradient-to-r from-[#8B5CF6] to-[#A78BFA] text-white font-bold rounded-full hover:shadow-[0_0_40px_rgba(139,92,246,0.5)] transition-all duration-300 flex items-center gap-3 text-lg"
                 >
                   <Search className="h-6 w-6" />
                   <span className="hidden sm:inline">Explore</span>
