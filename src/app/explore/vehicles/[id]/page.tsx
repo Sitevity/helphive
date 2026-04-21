@@ -3,104 +3,69 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { MapPin, Users, Star, Fuel, Gauge, Clock, ChevronLeft, ChevronRight, Heart, Share2, Shield, MessageCircle, Calendar } from 'lucide-react';
-import { Vehicle } from '@/types';
-import { formatCurrency, getVehicleTypeLabel, cn } from '@/lib/utils';
-import { Button, Card, Badge, StarRating } from '@/components/ui';
-import { VEHICLE_TYPES } from '@/constants';
+import Link from 'next/link';
+import { MapPin, Users, Star, Fuel, Gauge, Clock, ChevronLeft, Heart, Share2, Shield, Calendar, ArrowLeft } from 'lucide-react';
+import { formatCurrency, getVehicleTypeLabel } from '@/lib/utils';
+import { sampleVehicles } from '@/data/sample-data';
+import { Badge } from '@/components/ui';
 
 export default function VehicleDetailPage() {
   const params = useParams();
   const router = useRouter();
   const vehicleId = params.id as string;
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [vehicle, setVehicle] = useState<typeof sampleVehicles[0] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    const fetchVehicle = async () => {
-      setIsLoading(true);
-      try {
-        const { VehicleService } = await import('@/services/vehicle.service');
-        const data = await VehicleService.getVehicle(vehicleId);
-        setVehicle(data);
-      } catch (error) {
-        console.error('Error fetching vehicle:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (vehicleId) {
-      fetchVehicle();
-    }
+    // Find vehicle from sample data directly
+    const foundVehicle = sampleVehicles.find(v => v.id === vehicleId);
+    setVehicle(foundVehicle || null);
+    setIsLoading(false);
   }, [vehicleId]);
-
-  const images = vehicle?.images?.length ? vehicle.images : vehicle?.primaryImage ? [vehicle.primaryImage] : ['/placeholder-vehicle.jpg'];
-
-  const handleBooking = () => {
-    router.push(`/book/${vehicleId}`);
-  };
-
-  const handleContact = () => {
-    router.push(`/chat?vehicleId=${vehicleId}`);
-  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--color-background)]">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="aspect-video bg-gray-200 rounded-xl animate-shimmer" />
-              <div className="grid grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-video bg-gray-200 rounded-lg animate-shimmer" />
-                ))}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="h-8 bg-gray-200 rounded animate-shimmer" />
-              <div className="h-6 bg-gray-200 rounded animate-shimmer w-1/2" />
-              <div className="h-24 bg-gray-200 rounded animate-shimmer" />
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!vehicle) {
     return (
-      <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-[var(--color-text)]">Vehicle not found</h2>
-          <p className="text-[var(--color-text-muted)] mt-2">The vehicle you're looking for doesn't exist.</p>
-          <Button onClick={() => router.push('/explore/vehicles')} className="mt-4">
+          <h2 className="text-2xl font-bold text-gray-900">Vehicle not found</h2>
+          <p className="text-gray-500 mt-2">The vehicle you're looking for doesn't exist.</p>
+          <Link href="/explore/vehicles" className="inline-block mt-4 px-6 py-3 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors">
             Browse Vehicles
-          </Button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const vehicleType = VEHICLE_TYPES.find((t) => t.value === vehicle.type);
+  const images = vehicle.images?.length > 0 ? vehicle.images : [vehicle.image];
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)]">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] mb-6"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          Back to results
-        </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <Link href="/explore/vehicles" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Back to vehicles</span>
+          </Link>
+        </div>
+      </header>
 
+      <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Images */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden">
+            {/* Main Image */}
+            <div className="relative aspect-video bg-gray-100 rounded-2xl overflow-hidden">
               <Image
                 src={images[selectedImageIndex]}
                 alt={`${vehicle.brand} ${vehicle.model}`}
@@ -111,185 +76,170 @@ export default function VehicleDetailPage() {
                 <>
                   <button
                     onClick={() => setSelectedImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white transition-all"
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
                     onClick={() => setSelectedImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white transition-all"
                   >
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronLeft className="h-6 w-6 rotate-180" />
                   </button>
                 </>
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            {/* Thumbnail Gallery */}
+            <div className="grid grid-cols-4 gap-3">
               {images.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={cn(
-                    'aspect-video rounded-lg overflow-hidden border-2',
-                    selectedImageIndex === index ? 'border-[var(--color-primary)]' : 'border-transparent'
-                  )}
+                  className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                    selectedImageIndex === index ? 'border-pink-500 ring-2 ring-pink-200' : 'border-transparent hover:border-gray-300'
+                  }`}
                 >
-                  <Image
-                    src={img}
-                    alt={`Image ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={img} alt={`Image ${index + 1}`} fill className="object-cover" />
                 </button>
               ))}
             </div>
 
-            <Card className="p-6">
+            {/* Vehicle Info Card */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="primary">
-                      {vehicleType?.icon} {getVehicleTypeLabel(vehicle.type || '')}
-                    </Badge>
-                    {(vehicle.status === 'approved' || vehicle.isApproved) && (
-                      <Badge variant="success">Verified</Badge>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-pink-100 text-pink-700">{vehicle.type.replace('_', ' ')}</Badge>
+                    {vehicle.hostVerified && (
+                      <Badge className="bg-green-100 text-green-700">Verified</Badge>
                     )}
                   </div>
-                  <h1 className="text-2xl font-bold text-[var(--color-text)] mt-2">
+                  <h1 className="text-2xl font-bold text-gray-900">
                     {vehicle.brand} {vehicle.model}
                   </h1>
-                  <p className="text-[var(--color-text-muted)] flex items-center gap-1 mt-1">
+                  <p className="text-gray-500 flex items-center gap-2 mt-2">
                     <MapPin className="h-4 w-4" />
-                    {vehicle.city}, {vehicle.state}
+                    {vehicle.city}
                   </p>
                 </div>
-                {(vehicle.rating ?? 0) > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Star className="h-5 w-5 fill-[var(--color-warning)] text-[var(--color-warning)]" />
-                    <span className="text-xl font-bold">{(vehicle.rating ?? 0).toFixed(1)}</span>
-                    <span className="text-[var(--color-text-muted)]">({vehicle.totalReviews} reviews)</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-t border-b border-gray-100">
-                {vehicle.capacity && (
-                  <div className="text-center">
-                    <Users className="h-6 w-6 mx-auto text-[var(--color-primary)]" />
-                    <p className="text-sm text-[var(--color-text-muted)] mt-1">Capacity</p>
-                    <p className="font-semibold">{vehicle.capacity} seats</p>
-                  </div>
-                )}
-                {vehicle.transmission && (
-                  <div className="text-center">
-                    <Gauge className="h-6 w-6 mx-auto text-[var(--color-primary)]" />
-                    <p className="text-sm text-[var(--color-text-muted)] mt-1">Transmission</p>
-                    <p className="font-semibold capitalize">{vehicle.transmission}</p>
-                  </div>
-                )}
-                {vehicle.fuelType && (
-                  <div className="text-center">
-                    <Fuel className="h-6 w-6 mx-auto text-[var(--color-primary)]" />
-                    <p className="text-sm text-[var(--color-text-muted)] mt-1">Fuel</p>
-                    <p className="font-semibold capitalize">{vehicle.fuelType}</p>
-                  </div>
-                )}
-                {vehicle.year && (
-                  <div className="text-center">
-                    <Clock className="h-6 w-6 mx-auto text-[var(--color-primary)]" />
-                    <p className="text-sm text-[var(--color-text-muted)] mt-1">Year</p>
-                    <p className="font-semibold">{vehicle.year}</p>
-                  </div>
-                )}
-              </div>
-
-              {vehicle.features && vehicle.features.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="font-semibold text-lg text-[var(--color-text)]">Features</h3>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {vehicle.features.map((feature, index) => (
-                      <Badge key={index} variant="secondary">{feature}</Badge>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-2 bg-yellow-50 px-3 py-2 rounded-full">
+                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  <span className="font-bold text-lg">{vehicle.rating.toFixed(1)}</span>
+                  <span className="text-gray-500 text-sm">({vehicle.reviewCount})</span>
                 </div>
-              )}
+              </div>
 
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-t border-b border-gray-100 mt-6">
+                <div className="text-center">
+                  <Users className="h-6 w-6 mx-auto text-pink-500" />
+                  <p className="text-sm text-gray-500 mt-1">Capacity</p>
+                  <p className="font-semibold">{vehicle.capacity} seats</p>
+                </div>
+                <div className="text-center">
+                  <Gauge className="h-6 w-6 mx-auto text-pink-500" />
+                  <p className="text-sm text-gray-500 mt-1">Transmission</p>
+                  <p className="font-semibold">{vehicle.transmission}</p>
+                </div>
+                <div className="text-center">
+                  <Fuel className="h-6 w-6 mx-auto text-pink-500" />
+                  <p className="text-sm text-gray-500 mt-1">Fuel</p>
+                  <p className="font-semibold">{vehicle.fuelType}</p>
+                </div>
+                <div className="text-center">
+                  <Clock className="h-6 w-6 mx-auto text-pink-500" />
+                  <p className="text-sm text-gray-500 mt-1">Year</p>
+                  <p className="font-semibold">{vehicle.year}</p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="mt-6">
+                <h3 className="font-semibold text-lg text-gray-900 mb-3">About this vehicle</h3>
+                <p className="text-gray-600 leading-relaxed">{vehicle.description}</p>
+              </div>
+
+              {/* Features */}
+              <div className="mt-6">
+                <h3 className="font-semibold text-lg text-gray-900 mb-3">Features</h3>
+                <div className="flex flex-wrap gap-2">
+                  {vehicle.features.map((feature, index) => (
+                    <span key={index} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
               <div className="mt-6 flex items-center gap-4">
-                <button
-                  onClick={() => setIsFavorite(!isFavorite)}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-lg border',
-                    isFavorite ? 'border-[var(--color-error)] text-[var(--color-error)]' : 'border-gray-300'
-                  )}
-                >
-                  <Heart className={cn('h-5 w-5', isFavorite && 'fill-current')} />
-                  {isFavorite ? 'Saved' : 'Save'}
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <Heart className="h-5 w-5" />
+                  <span>Save</span>
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
                   <Share2 className="h-5 w-5" />
-                  Share
+                  <span>Share</span>
                 </button>
               </div>
-            </Card>
+            </div>
           </div>
 
+          {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <Card className="p-6 sticky top-4">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-[var(--color-primary)]">
-                  {formatCurrency(vehicle.hourlyRate || vehicle.pricePerHour || vehicle.pricePerDay || 0)}
+                <span className="text-3xl font-bold text-pink-500">
+                  {formatCurrency(vehicle.pricePerHour)}
                 </span>
-                <span className="text-[var(--color-text-muted)]">/hour</span>
+                <span className="text-gray-500">/hour</span>
               </div>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl font-semibold text-[var(--color-text)]">
-                  {formatCurrency(vehicle.pricePerDay || 0)}
+                <span className="text-xl font-semibold text-gray-900">
+                  {formatCurrency(vehicle.pricePerDay)}
                 </span>
-                <span className="text-[var(--color-text-muted)]">/day</span>
+                <span className="text-gray-500">/day</span>
               </div>
 
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4" />
-                  <span>Min. booking: {vehicle.minimumDuration || 1} hour(s)</span>
+                  <span>Min. booking: {vehicle.kilometersIncluded} km included</span>
                 </div>
-                {vehicle.totalBookings && vehicle.totalBookings > 0 && (
-                  <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
-                    <Shield className="h-4 w-4" />
-                    <span>{vehicle.totalBookings} bookings</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Shield className="h-4 w-4" />
+                  <span>Extra km: ₹{vehicle.extraKmRate}/km</span>
+                </div>
               </div>
 
               <div className="mt-6 space-y-3">
-                <Button onClick={handleBooking} className="w-full" size="lg">
+                <button onClick={() => router.push(`/book/${vehicleId}`)} className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold hover:shadow-lg hover:shadow-pink-200 transition-all">
                   Book Now
-                </Button>
-                <Button onClick={handleContact} variant="secondary" className="w-full">
-                  <MessageCircle className="h-4 w-4 mr-2" />
+                </button>
+                <button className="w-full py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium">
                   Contact Host
-                </Button>
+                </button>
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-100">
-                <h4 className="font-semibold text-[var(--color-text)]">Hosted by</h4>
+                <h4 className="font-semibold text-gray-900">Hosted by</h4>
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-semibold">
-                    {vehicle.hostName?.charAt(0).toUpperCase() || 'H'}
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold text-lg">
+                    {vehicle.hostName?.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium text-[var(--color-text)]">{vehicle.hostName || 'Host'}</p>
+                    <p className="font-medium text-gray-900">{vehicle.hostName}</p>
                     {vehicle.hostVerified && (
-                      <p className="text-sm text-[var(--color-success)]">Verified Host</p>
+                      <p className="text-sm text-green-600">Verified Host</p>
                     )}
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
